@@ -14,10 +14,20 @@ import Task from "./src/task.js";
 export default function App() {
   const [task, setTask] = useState("");
   const [list, setList] = useState([]);
+  const [errorMessage, setErrorMessage] = useState("");
 
   function handleAdd() {
     if (task === "") {
       alert("preencha o input!");
+      return;
+    }
+
+    const existis = list.some((t) => t.item === task);
+
+    if (existis) {
+      setErrorMessage("A tarefa já existe!");
+      setTask("");
+
       return;
     }
 
@@ -28,6 +38,7 @@ export default function App() {
 
     setList((oldArray) => [data, ...oldArray]);
     setTask("");
+    setErrorMessage("");
   }
 
   function handleDelete(item) {
@@ -45,7 +56,10 @@ export default function App() {
       <View style={styles.containerInput}>
         <TextInput
           value={task}
-          onChangeText={(text) => setTask(text)}
+          onChangeText={(text) => {
+            setTask(text);
+            setErrorMessage("");
+          }}
           placeholder="Digite sua tarefa..."
           style={styles.input}
         />
@@ -59,14 +73,13 @@ export default function App() {
         data={list}
         keyExtractor={(item) => item.key}
         renderItem={({ item }) => (
-          <Task 
-            data={item} 
-            deleteItem={
-              () => handleDelete(item.item)
-            } />
+          <Task data={item} deleteItem={() => handleDelete(item.item)} />
         )}
         style={styles.list}
       />
+      {errorMessage ? (
+        <Text style={styles.errorMessage}>{errorMessage}</Text>
+      ) : null}
     </View>
   );
 }
@@ -79,7 +92,7 @@ const styles = StyleSheet.create({
   },
   tasks: {
     fontWeight: "bold",
-    fontSize: 24,
+    fontSize: 34,
     color: "#FFF",
     marginTop: "5%",
     paddingStart: "5%",
@@ -113,5 +126,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     items: "center",
+  },
+  errorMessage: {
+    color: "#ffb6c1",
+    marginTop: 10,
+    marginHorizontal: 20,
+    fontSize: 25,
+    fontWeight: "bold",
+    textAlign: "center",
+    justifyContent: "center",
   },
 });
